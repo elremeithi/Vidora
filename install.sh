@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# Kinora installer: system libraries via your package manager, Python deps in a private venv,
-# a `kinora` launcher in ~/.local/bin, plus menu entry, icon and file associations.
+# Vidora installer: system libraries via your package manager, Python deps in a private venv,
+# a `vidora` launcher in ~/.local/bin, plus menu entry, icon and file associations.
 #
 #   ./install.sh                 install / update for the current user
-#   ./install.sh --set-default   also make Kinora the default app for video files
+#   ./install.sh --set-default   also make Vidora the default app for video files
 #   ./install.sh --no-deps       skip the package-manager step
 #   ./install.sh --uninstall     remove everything this script installed (keeps your settings)
 set -euo pipefail
 
-APP=kinora
+APP=vidora
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 PREFIX="$DATA_HOME/$APP"
@@ -37,7 +37,7 @@ refresh_desktop_db() {
 }
 
 if [[ $UNINSTALL -eq 1 ]]; then
-  say "Removing Kinora"
+  say "Removing Vidora"
   rm -rf "$PREFIX" "$BIN/$APP" "$APPS/$APP.desktop" "$ICONS/$APP.svg"
   refresh_desktop_db
   say "Done. Settings were kept in ${XDG_CONFIG_HOME:-$HOME/.config}/$APP"
@@ -81,7 +81,7 @@ install_deps() {
 
 PY="$(command -v python3 || true)"
 [[ -n "$PY" ]] || { echo "python3 not found" >&2; exit 1; }
-"$PY" - <<'EOF' || { echo "Kinora needs Python 3.10 or newer" >&2; exit 1; }
+"$PY" - <<'EOF' || { echo "Vidora needs Python 3.10 or newer" >&2; exit 1; }
 import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)
 EOF
 
@@ -94,13 +94,13 @@ mkdir -p "$PREFIX"
 say "Copying application files"
 rm -rf "$PREFIX/app"
 mkdir -p "$PREFIX/app"
-cp -r "$SRC/kinora" "$PREFIX/app/"
+cp -r "$SRC/vidora" "$PREFIX/app/"
 find "$PREFIX/app" -name '__pycache__' -prune -exec rm -rf {} +
 
 say "Checking that libmpv loads"
-if ! "$PREFIX/venv/bin/python" -c "import mpv" 2>/tmp/kinora-mpv-check.txt; then
+if ! "$PREFIX/venv/bin/python" -c "import mpv" 2>/tmp/vidora-mpv-check.txt; then
   warn "python-mpv could not load libmpv:"
-  cat /tmp/kinora-mpv-check.txt >&2
+  cat /tmp/vidora-mpv-check.txt >&2
   warn "Install libmpv (libmpv2 / mpv-libs / mpv) and run this script again."
 fi
 
@@ -108,7 +108,7 @@ mkdir -p "$BIN" "$APPS" "$ICONS"
 cat > "$BIN/$APP" <<EOF
 #!/bin/sh
 export PYTHONPATH="$PREFIX/app\${PYTHONPATH:+:\$PYTHONPATH}"
-exec "$PREFIX/venv/bin/python" -m kinora "\$@"
+exec "$PREFIX/venv/bin/python" -m vidora "\$@"
 EOF
 chmod +x "$BIN/$APP"
 
@@ -118,7 +118,7 @@ cp "$SRC/data/$APP.svg" "$ICONS/$APP.svg"
 refresh_desktop_db
 
 if [[ $SET_DEFAULT -eq 1 ]] && command -v xdg-mime >/dev/null; then
-  say "Setting Kinora as the default player"
+  say "Setting Vidora as the default player"
   mimes=$(grep '^MimeType=' "$SRC/data/$APP.desktop" | cut -d= -f2 | tr ';' ' ')
   # shellcheck disable=SC2086
   xdg-mime default "$APP.desktop" $mimes
@@ -126,6 +126,6 @@ fi
 
 case ":$PATH:" in
   *":$BIN:"*) ;;
-  *) warn "$BIN is not on your PATH; add it, or start Kinora from the application menu." ;;
+  *) warn "$BIN is not on your PATH; add it, or start Vidora from the application menu." ;;
 esac
-say "Installed. Run 'kinora' or find Kinora in your application menu."
+say "Installed. Run 'vidora' or find Vidora in your application menu."

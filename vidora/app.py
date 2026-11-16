@@ -17,10 +17,10 @@ def _prepare_environment(settings):
                 and "QT_QPA_PLATFORM" not in os.environ):
             os.environ["QT_QPA_PLATFORM"] = "xcb"
     elif sys.platform == "win32":
-        # Development convenience: find mpv-2.dll / libmpv-2.dll next to the project or via KINORA_MPV_DIR.
+        # Development convenience: find mpv-2.dll / libmpv-2.dll next to the project or via VIDORA_MPV_DIR.
         here = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        dirs = [os.environ.get("KINORA_MPV_DIR"), here]
-        if getattr(sys, "frozen", False):  # packaged Kinora.exe: libmpv-2.dll ships next to it
+        dirs = [os.environ.get("VIDORA_MPV_DIR"), here]
+        if getattr(sys, "frozen", False):  # packaged Vidora.exe: libmpv-2.dll ships next to it
             dirs = [os.path.dirname(sys.executable), getattr(sys, "_MEIPASS", None)] + dirs
         for d in filter(None, dirs):
             if os.path.isdir(d):
@@ -91,8 +91,8 @@ def _install_dark_title_bars(app):
     class _Hook(QObject):
         def eventFilter(self, obj, ev):
             if ev.type() == QEvent.Show and getattr(obj, "isWindow", lambda: False)() \
-                    and not obj.property("_kinora_dark"):
-                obj.setProperty("_kinora_dark", True)
+                    and not obj.property("_vidora_dark"):
+                obj.setProperty("_vidora_dark", True)
                 dark_title_bar(obj)
             return False
 

@@ -1,8 +1,8 @@
-# Kinora
+# Vidora
 
 A keyboard-friendly desktop video player for Linux. It brings the conveniences Windows
 power users know from players like PotPlayer to a native Linux app: everything is in a
-right-click menu, every key can be remapped, and it plays almost any file. Kinora is
+right-click menu, every key can be remapped, and it plays almost any file. Vidora is
 original software: it borrows features and familiar key defaults, not names, skins or artwork.
 
 Playback is done by **libmpv** (via `python-mpv`), so you get mpv's GPU rendering,
@@ -13,47 +13,47 @@ with a dark theme.
 
 ### Linux Mint, Ubuntu, Debian (one click)
 
-Double-click **`kinora_0.1.0_amd64.deb`** in the file manager, then click **Install** and enter
+Double-click **`vidora_0.1.0_amd64.deb`** in the file manager, then click **Install** and enter
 your password. The package installer pulls in libmpv and Qt's system libraries; the Python parts
-ship inside the package, so no internet connection or terminal is needed. Kinora then shows up in
+ship inside the package, so no internet connection or terminal is needed. Vidora then shows up in
 the menu under *Sound & Video*, and it appears in *Open With* for video files. To make it the default
-player, right-click a video → *Properties* → *Open With* → Kinora → *Set as default*.
+player, right-click a video → *Properties* → *Open With* → Vidora → *Set as default*.
 
 Works on Mint 21.x and 22.x, LMDE 6, Ubuntu 22.04+, Debian 12+ (64-bit). Remove it again from the
-Software Manager or with `sudo apt remove kinora`.
+Software Manager or with `sudo apt remove vidora`.
 
 ### CachyOS, Arch, EndeavourOS, Manjaro
 
 ```bash
-sudo pacman -U kinora-0.1.0-1-any.pkg.tar.xz
+sudo pacman -U vidora-0.1.0-1-any.pkg.tar.xz
 ```
 
 pacman installs the dependencies from the official repos (`pyside6`, `mpv`, `python-mpv`) and
-adds Kinora to the application menu. Remove it with `sudo pacman -R kinora`. To build it yourself,
-put `PKGBUILD` next to `kinora-0.1.0-linux.tar.gz` and run `makepkg -si`. Install `yt-dlp` for web videos.
-On KDE Plasma (Wayland), set Kinora as the default player in *System Settings → Default
+adds Vidora to the application menu. Remove it with `sudo pacman -R vidora`. To build it yourself,
+put `PKGBUILD` next to `vidora-0.1.0-linux.tar.gz` and run `makepkg -si`. Install `yt-dlp` for web videos.
+On KDE Plasma (Wayland), set Vidora as the default player in *System Settings → Default
 Applications → File Associations*, or right-click a video → *Open With* → *Other Application*.
 
 ### Windows 10/11 (64-bit)
 
-Unzip **`Kinora-0.1.0-windows-x64.zip`** anywhere (for example `C:\Program Files\Kinora` or your
-user folder) and run `Kinora.exe`. Nothing else is needed: libmpv, Qt and Python are inside the folder.
-To get Kinora under *Open with* and in *Settings → Default apps*, open Preferences → General →
-**Add Kinora to 'Open with' and Default apps**. This writes per-user entries only, and the same button
-removes them again. Settings are kept in `%APPDATA%\kinora`. For YouTube and other web videos, put
-`yt-dlp.exe` next to `Kinora.exe` or anywhere on your PATH.
+Unzip **`Vidora-0.1.0-windows-x64.zip`** anywhere (for example `C:\Program Files\Vidora` or your
+user folder) and run `Vidora.exe`. Nothing else is needed: libmpv, Qt and Python are inside the folder.
+To get Vidora under *Open with* and in *Settings → Default apps*, open Preferences → General →
+**Add Vidora to 'Open with' and Default apps**. This writes per-user entries only, and the same button
+removes them again. Settings are kept in `%APPDATA%\vidora`. For YouTube and other web videos, put
+`yt-dlp.exe` next to `Vidora.exe` or anywhere on your PATH.
 
 ### Any distro (script)
 
 ```bash
-tar xzf kinora-0.1.0-linux.tar.gz && cd kinora-0.1.0
+tar xzf vidora-0.1.0-linux.tar.gz && cd vidora-0.1.0
 ./install.sh                 # apt / dnf / pacman / zypper deps + venv + menu entry
-./install.sh --set-default   # same, and make Kinora the default video player
+./install.sh --set-default   # same, and make Vidora the default video player
 ./install.sh --uninstall
 ```
 
-The installer puts a private virtualenv in `~/.local/share/kinora`, a `kinora` launcher in
-`~/.local/bin`, and `kinora.desktop` + icon in `~/.local/share`. The only system packages it needs
+The installer puts a private virtualenv in `~/.local/share/vidora`, a `vidora` launcher in
+`~/.local/bin`, and `vidora.desktop` + icon in `~/.local/share`. The only system packages it needs
 are **libmpv** (`libmpv2`/`libmpv1` on Debian/Ubuntu, `mpv-libs` on Fedora via RPM Fusion,
 `mpv` on Arch) and `xcb-util-cursor` for Qt. `yt-dlp` is optional (YouTube and other web videos).
 
@@ -91,7 +91,7 @@ pip install -r requirements.txt
 **Video**
 - Aspect ratio override, crop presets and crop-to-fill, zoom, rotate, flip, deinterlace,
   brightness/contrast/saturation/hue, hardware decoding toggle.
-- Screenshots (with or without subtitles) to `~/Pictures/Kinora`, copy frame to clipboard.
+- Screenshots (with or without subtitles) to `~/Pictures/Vidora`, copy frame to clipboard.
 - Media information dialog (codecs, bitrates, HDR/colour info, hwdec in use, tracks, chapters).
 
 ## Default keys
@@ -124,8 +124,8 @@ conflicts are detected).
 
 ## Settings and files
 
-- `~/.config/kinora/settings.json` – preferences, key overrides, recent files
-- `~/.config/kinora/resume.json` – resume positions (hashed paths)
+- `~/.config/vidora/settings.json` – preferences, key overrides, recent files
+- `~/.config/vidora/resume.json` – resume positions (hashed paths)
 - Your own `~/.config/mpv/mpv.conf` and scripts are ignored unless you enable
   *Preferences → General → Load my mpv.conf*.
 
@@ -135,26 +135,26 @@ conflicts are detected).
   (Mint Cinnamon/MATE/Xfce, KDE on X11), the most robust choice there. On Wayland and Windows it
   uses libmpv's OpenGL render API inside Qt, which also lets the fullscreen controls float over the video.
 - If you see a black video area while sound plays, pick the other surface in
-  *Preferences → General → Video surface* and restart Kinora. Choosing *Native* on Wayland runs Kinora through XWayland.
+  *Preferences → General → Video surface* and restart Vidora. Choosing *Native* on Wayland runs Vidora through XWayland.
 - VA-API zero-copy needs EGL. On X11 Qt uses GLX by default; if `HW:` in the control bar does not
-  show `vaapi`, start Kinora with `QT_XCB_GL_INTEGRATION=xcb_egl kinora`, or pick
+  show `vaapi`, start Vidora with `QT_XCB_GL_INTEGRATION=xcb_egl vidora`, or pick
   *Automatic, copy-back* in Preferences → Video.
 - Always-on-top relies on the compositor; most Wayland compositors ignore requests from apps.
-- `kinora --debug file.mkv` prints mpv's verbose log to the terminal.
+- `vidora --debug file.mkv` prints mpv's verbose log to the terminal.
 
 ## Project layout
 
 ```
-kinora/app.py          entry point, single-instance IPC, environment setup
-kinora/mainwindow.py   window, commands, context menu, mouse/drag-drop handling
-kinora/engine.py       libmpv wrapper (property observers -> Qt signals)
-kinora/mpvwidget.py    OpenGL render-API widget and native-window fallback
-kinora/thumbnailer.py  seek-bar previews from a second, silent libmpv instance
-kinora/widgets.py      control bar, seek bar, preview popup
-kinora/playlist.py     playlist dock
-kinora/prefs.py        preferences dialog and key remapping
-kinora/actions.py      every command with its default keys
-kinora/config.py       settings + resume store
+vidora/app.py          entry point, single-instance IPC, environment setup
+vidora/mainwindow.py   window, commands, context menu, mouse/drag-drop handling
+vidora/engine.py       libmpv wrapper (property observers -> Qt signals)
+vidora/mpvwidget.py    OpenGL render-API widget and native-window fallback
+vidora/thumbnailer.py  seek-bar previews from a second, silent libmpv instance
+vidora/widgets.py      control bar, seek bar, preview popup
+vidora/playlist.py     playlist dock
+vidora/prefs.py        preferences dialog and key remapping
+vidora/actions.py      every command with its default keys
+vidora/config.py       settings + resume store
 ```
 
 ## Not done yet
@@ -166,10 +166,10 @@ kinora/config.py       settings + resume store
 ## Building the packages
 
 ```
-python tools/build_deb.py       # dist/kinora_<ver>_amd64.deb (downloads Linux wheels into build/wheels once)
-python tools/build_release.py   # dist/kinora-<ver>-linux.tar.gz
-python tools/build_arch.py      # dist/kinora-<ver>-1-any.pkg.tar.xz + dist/PKGBUILD (run after build_release)
-python tools/build_windows.py   # publish\Kinora\Kinora.exe + publish\Kinora-<ver>-windows-x64.zip
+python tools/build_deb.py       # dist/vidora_<ver>_amd64.deb (downloads Linux wheels into build/wheels once)
+python tools/build_release.py   # dist/vidora-<ver>-linux.tar.gz
+python tools/build_arch.py      # dist/vidora-<ver>-1-any.pkg.tar.xz + dist/PKGBUILD (run after build_release)
+python tools/build_windows.py   # publish\Vidora\Vidora.exe + publish\Vidora-<ver>-windows-x64.zip
 ```
 The Linux builders run on Windows or Linux and don't need dpkg. The Windows build runs on Windows
 only and needs `pyinstaller`, `pillow`, and `libmpv-2.dll` in `build\libmpv\`.

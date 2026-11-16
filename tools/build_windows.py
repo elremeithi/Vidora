@@ -1,8 +1,8 @@
-"""Build the Windows version: publish\\Kinora\\Kinora.exe (+ a zip of that folder).
+"""Build the Windows version: publish\\Vidora\\Vidora.exe (+ a zip of that folder).
 
 Needs a Windows Python with the app's requirements, PyInstaller and Pillow installed, and
 libmpv-2.dll (64-bit, e.g. the "mpv-dev-x86_64" archive from
-github.com/shinchiro/mpv-winbuild-cmake/releases) in build\\libmpv\\ or %KINORA_MPV_DIR%:
+github.com/shinchiro/mpv-winbuild-cmake/releases) in build\\libmpv\\ or %VIDORA_MPV_DIR%:
 
     python -m pip install -r requirements.txt pyinstaller pillow
     python tools/build_windows.py
@@ -21,7 +21,7 @@ import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-APP = "Kinora"
+APP = "Vidora"
 BUILD = ROOT / "build" / "win"
 PUBLISH = ROOT / "publish"
 
@@ -32,14 +32,14 @@ EXCLUDES = ["tkinter", "unittest", "pydoc_data", "test", "PySide6.QtQml", "PySid
 
 
 def version():
-    return re.search(r'__version__\s*=\s*"([^"]+)"', (ROOT / "kinora" / "__init__.py").read_text("utf-8")).group(1)
+    return re.search(r'__version__\s*=\s*"([^"]+)"', (ROOT / "vidora" / "__init__.py").read_text("utf-8")).group(1)
 
 
 def find_libmpv() -> Path:
-    for d in (os.environ.get("KINORA_MPV_DIR"), ROOT / "build" / "libmpv"):
+    for d in (os.environ.get("VIDORA_MPV_DIR"), ROOT / "build" / "libmpv"):
         if d and (Path(d) / "libmpv-2.dll").is_file():
             return Path(d) / "libmpv-2.dll"
-    sys.exit("libmpv-2.dll not found: put it in build\\libmpv\\ or set KINORA_MPV_DIR.")
+    sys.exit("libmpv-2.dll not found: put it in build\\libmpv\\ or set VIDORA_MPV_DIR.")
 
 
 def make_ico(path: Path):
@@ -49,7 +49,7 @@ def make_ico(path: Path):
     from PySide6.QtGui import QGuiApplication
     app = QGuiApplication.instance() or QGuiApplication(["x", "-platform", "offscreen"])  # noqa: F841
     sys.path.insert(0, str(ROOT))
-    from kinora.icons import app_icon
+    from vidora.icons import app_icon
     pm = app_icon().pixmap(256, 256)
     ba = QByteArray()
     buf = QBuffer(ba)
@@ -64,12 +64,12 @@ def version_file(path: Path, ver: str):
     path.write_text(f"""VSVersionInfo(
   ffi=FixedFileInfo(filevers={nums}, prodvers={nums}, mask=0x3f, flags=0x0, OS=0x40004, fileType=0x1, subtype=0x0),
   kids=[StringFileInfo([StringTable('040904B0', [
-      StringStruct('FileDescription', 'Kinora video player'),
-      StringStruct('ProductName', 'Kinora'),
+      StringStruct('FileDescription', 'Vidora video player'),
+      StringStruct('ProductName', 'Vidora'),
       StringStruct('FileVersion', '{ver}'),
       StringStruct('ProductVersion', '{ver}'),
-      StringStruct('OriginalFilename', 'Kinora.exe'),
-      StringStruct('InternalName', 'Kinora')])]),
+      StringStruct('OriginalFilename', 'Vidora.exe'),
+      StringStruct('InternalName', 'Vidora')])]),
     VarFileInfo([VarStruct('Translation', [1033, 1200])])]
 )
 """, encoding="utf-8")
@@ -81,7 +81,7 @@ def main():
     ver = version()
     libmpv = find_libmpv()
     BUILD.mkdir(parents=True, exist_ok=True)
-    ico = BUILD / "kinora.ico"
+    ico = BUILD / "vidora.ico"
     make_ico(ico)
     vfile = BUILD / "version.txt"
     version_file(vfile, ver)
@@ -91,18 +91,18 @@ def main():
            "--paths", str(ROOT),
            "--hidden-import", "PySide6.QtOpenGL", "--hidden-import", "PySide6.QtOpenGLWidgets",
            "--hidden-import", "PySide6.QtNetwork", "--hidden-import", "mpv"]
-    for mod in ["kinora." + p.stem for p in (ROOT / "kinora").glob("*.py") if p.stem != "__init__"]:
+    for mod in ["vidora." + p.stem for p in (ROOT / "vidora").glob("*.py") if p.stem != "__init__"]:
         cmd += ["--hidden-import", mod]
     for x in EXCLUDES:
         cmd += ["--exclude-module", x]
-    subprocess.run(cmd + [str(ROOT / "tools" / "kinora_entry.py")], check=True)
+    subprocess.run(cmd + [str(ROOT / "tools" / "vidora_entry.py")], check=True)
 
     out = PUBLISH / APP
     if out.exists():
         shutil.rmtree(out)
     PUBLISH.mkdir(exist_ok=True)
     shutil.copytree(BUILD / "dist" / APP, out)
-    shutil.copy(libmpv, out / "libmpv-2.dll")  # next to Kinora.exe, where app.py looks first
+    shutil.copy(libmpv, out / "libmpv-2.dll")  # next to Vidora.exe, where app.py looks first
     shutil.copy(ROOT / "README.md", out / "README.md")
     z = PUBLISH / f"{APP}-{ver}-windows-x64.zip"
     with zipfile.ZipFile(z, "w", zipfile.ZIP_DEFLATED, compresslevel=6) as zf:

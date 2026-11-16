@@ -1,8 +1,8 @@
-"""Build Kinora for Arch Linux / CachyOS / EndeavourOS / Manjaro.
+"""Build Vidora for Arch Linux / CachyOS / EndeavourOS / Manjaro.
 
 Writes two things to dist/:
-  kinora-<ver>-1-any.pkg.tar.xz   ready to install:  sudo pacman -U kinora-<ver>-1-any.pkg.tar.xz
-  PKGBUILD                       for `makepkg -si` next to kinora-<ver>-linux.tar.gz
+  vidora-<ver>-1-any.pkg.tar.xz   ready to install:  sudo pacman -U vidora-<ver>-1-any.pkg.tar.xz
+  PKGBUILD                       for `makepkg -si` next to vidora-<ver>-linux.tar.gz
 
 The package is architecture-independent: Qt (pyside6), libmpv (mpv) and python-mpv all
 come from Arch's official repos, so pacman installs them as dependencies.
@@ -29,14 +29,14 @@ DEPENDS = ["python", "pyside6", "mpv", "python-mpv"]
 OPTDEPENDS = ["yt-dlp: play YouTube and other web videos"]
 
 LAUNCHER = """#!/bin/sh
-# Kinora launcher (installed by the kinora package)
-export PYTHONPATH="/usr/lib/kinora${PYTHONPATH:+:$PYTHONPATH}"
-exec /usr/bin/python3 -m kinora "$@"
+# Vidora launcher (installed by the vidora package)
+export PYTHONPATH="/usr/lib/vidora${PYTHONPATH:+:$PYTHONPATH}"
+exec /usr/bin/python3 -m vidora "$@"
 """
 
 
 def version():
-    return re.search(r'__version__\s*=\s*"([^"]+)"', (ROOT / "kinora" / "__init__.py").read_text("utf-8")).group(1)
+    return re.search(r'__version__\s*=\s*"([^"]+)"', (ROOT / "vidora" / "__init__.py").read_text("utf-8")).group(1)
 
 
 def lf(b: bytes) -> bytes:
@@ -46,14 +46,14 @@ def lf(b: bytes) -> bytes:
 def payload():
     """path -> (bytes, mode) for everything installed under /."""
     files = {}
-    for f in sorted((ROOT / "kinora").rglob("*.py")):
+    for f in sorted((ROOT / "vidora").rglob("*.py")):
         if "__pycache__" not in f.parts:
-            files[f"usr/lib/kinora/{f.relative_to(ROOT).as_posix()}"] = (lf(f.read_bytes()), 0o644)
-    files["usr/bin/kinora"] = (LAUNCHER.encode(), 0o755)
-    desktop = re.sub(rb"(?m)^Exec=.*$", b"Exec=kinora %U", lf((ROOT / "data" / "kinora.desktop").read_bytes()))
-    files["usr/share/applications/kinora.desktop"] = (desktop, 0o644)
-    files["usr/share/icons/hicolor/scalable/apps/kinora.svg"] = (lf((ROOT / "data" / "kinora.svg").read_bytes()), 0o644)
-    files["usr/share/doc/kinora/README.md"] = (lf((ROOT / "README.md").read_bytes()), 0o644)
+            files[f"usr/lib/vidora/{f.relative_to(ROOT).as_posix()}"] = (lf(f.read_bytes()), 0o644)
+    files["usr/bin/vidora"] = (LAUNCHER.encode(), 0o755)
+    desktop = re.sub(rb"(?m)^Exec=.*$", b"Exec=vidora %U", lf((ROOT / "data" / "vidora.desktop").read_bytes()))
+    files["usr/share/applications/vidora.desktop"] = (desktop, 0o644)
+    files["usr/share/icons/hicolor/scalable/apps/vidora.svg"] = (lf((ROOT / "data" / "vidora.svg").read_bytes()), 0o644)
+    files["usr/share/doc/vidora/README.md"] = (lf((ROOT / "README.md").read_bytes()), 0o644)
     return files
 
 
@@ -61,9 +61,9 @@ def build_pkg(ver):
     now = int(time.time())
     files = payload()
     size = sum(len(d) for d, _ in files.values())
-    lines = [f"pkgname = kinora", "pkgbase = kinora", f"xdata = pkgtype=pkg",
+    lines = [f"pkgname = vidora", "pkgbase = vidora", f"xdata = pkgtype=pkg",
              f"pkgver = {ver}-{PKGREL}", f"pkgdesc = {DESC}", f"builddate = {now}",
-             "packager = Kinora <kinora@localhost>", f"size = {size}", "arch = any",
+             "packager = Vidora <vidora@localhost>", f"size = {size}", "arch = any",
              "license = LicenseRef-unspecified"]
     lines += [f"depend = {d}" for d in DEPENDS]
     lines += [f"optdepend = {d}" for d in OPTDEPENDS]
@@ -89,20 +89,20 @@ def build_pkg(ver):
         for p in sorted(files):
             data, mode = files[p]
             t.addfile(info(p, len(data), mode), io.BytesIO(data))
-    out = DIST / f"kinora-{ver}-{PKGREL}-any.pkg.tar.xz"
+    out = DIST / f"vidora-{ver}-{PKGREL}-any.pkg.tar.xz"
     out.write_bytes(lzma.compress(raw.getvalue(), preset=9, check=lzma.CHECK_CRC64))
     return out
 
 
 def build_pkgbuild(ver):
-    src = DIST / f"kinora-{ver}-linux.tar.gz"
+    src = DIST / f"vidora-{ver}-linux.tar.gz"
     if not src.is_file():
         sys.exit(f"{src.name} missing: run tools/build_release.py first.")
     sha = hashlib.sha256(src.read_bytes()).hexdigest()
     deps = " ".join(f"'{d}'" for d in DEPENDS)
     opt = " ".join(f"'{d}'" for d in OPTDEPENDS)
-    text = f"""# Maintainer: Kinora <kinora@localhost>
-pkgname=kinora
+    text = f"""# Maintainer: Vidora <vidora@localhost>
+pkgname=vidora
 pkgver={ver}
 pkgrel={PKGREL}
 pkgdesc="{DESC}"
@@ -111,23 +111,23 @@ url='https://mpv.io'
 license=('LicenseRef-unspecified')
 depends=({deps})
 optdepends=({opt})
-source=("kinora-$pkgver-linux.tar.gz")
+source=("vidora-$pkgver-linux.tar.gz")
 sha256sums=('{sha}')
 
 package() {{
-  cd "kinora-$pkgver"
-  install -d "$pkgdir/usr/lib/kinora"
-  cp -r kinora "$pkgdir/usr/lib/kinora/"
-  python -m compileall -q -d /usr/lib/kinora "$pkgdir/usr/lib/kinora"
-  install -Dm755 /dev/stdin "$pkgdir/usr/bin/kinora" <<'EOF'
+  cd "vidora-$pkgver"
+  install -d "$pkgdir/usr/lib/vidora"
+  cp -r vidora "$pkgdir/usr/lib/vidora/"
+  python -m compileall -q -d /usr/lib/vidora "$pkgdir/usr/lib/vidora"
+  install -Dm755 /dev/stdin "$pkgdir/usr/bin/vidora" <<'EOF'
 #!/bin/sh
-export PYTHONPATH="/usr/lib/kinora${{PYTHONPATH:+:$PYTHONPATH}}"
-exec /usr/bin/python3 -m kinora "$@"
+export PYTHONPATH="/usr/lib/vidora${{PYTHONPATH:+:$PYTHONPATH}}"
+exec /usr/bin/python3 -m vidora "$@"
 EOF
-  sed 's|^Exec=.*|Exec=kinora %U|; s|^TryExec=.*|TryExec=kinora|' data/kinora.desktop | \\
-    install -Dm644 /dev/stdin "$pkgdir/usr/share/applications/kinora.desktop"
-  install -Dm644 data/kinora.svg "$pkgdir/usr/share/icons/hicolor/scalable/apps/kinora.svg"
-  install -Dm644 README.md "$pkgdir/usr/share/doc/kinora/README.md"
+  sed 's|^Exec=.*|Exec=vidora %U|; s|^TryExec=.*|TryExec=vidora|' data/vidora.desktop | \\
+    install -Dm644 /dev/stdin "$pkgdir/usr/share/applications/vidora.desktop"
+  install -Dm644 data/vidora.svg "$pkgdir/usr/share/icons/hicolor/scalable/apps/vidora.svg"
+  install -Dm644 README.md "$pkgdir/usr/share/doc/vidora/README.md"
 }}
 """
     out = DIST / "PKGBUILD"

@@ -1,8 +1,8 @@
-"""Build dist/kinora_<version>_amd64.deb for Linux Mint / Ubuntu / Debian.
+"""Build dist/vidora_<version>_amd64.deb for Linux Mint / Ubuntu / Debian.
 
 Double-clicking the .deb in Mint opens the package installer, which installs the system
 libraries (libmpv, Qt's xcb deps) from the distro and runs postinst. postinst builds a
-private venv in /opt/kinora from wheels shipped inside the package, so installing needs
+private venv in /opt/vidora from wheels shipped inside the package, so installing needs
 no internet connection and no terminal.
 
 Works on any OS (no dpkg needed): the .deb is an `ar` archive written by hand.
@@ -36,19 +36,19 @@ DEPENDS = [
 RECOMMENDS = ["yt-dlp"]
 
 LAUNCHER = """#!/bin/sh
-# Kinora launcher (installed by the kinora .deb)
-export PYTHONPATH="/opt/kinora/app${PYTHONPATH:+:$PYTHONPATH}"
-exec /opt/kinora/venv/bin/python -m kinora "$@"
+# Vidora launcher (installed by the vidora .deb)
+export PYTHONPATH="/opt/vidora/app${PYTHONPATH:+:$PYTHONPATH}"
+exec /opt/vidora/venv/bin/python -m vidora "$@"
 """
 
 POSTINST = """#!/bin/sh
 set -e
 if [ "$1" = "configure" ]; then
-    rm -rf /opt/kinora/venv
-    python3 -m venv /opt/kinora/venv
-    /opt/kinora/venv/bin/python -m pip install --quiet --no-index --no-cache-dir \\
-        --find-links=/opt/kinora/wheels %s
-    /opt/kinora/venv/bin/python -m compileall -q /opt/kinora/app >/dev/null 2>&1 || true
+    rm -rf /opt/vidora/venv
+    python3 -m venv /opt/vidora/venv
+    /opt/vidora/venv/bin/python -m pip install --quiet --no-index --no-cache-dir \\
+        --find-links=/opt/vidora/wheels %s
+    /opt/vidora/venv/bin/python -m compileall -q /opt/vidora/app >/dev/null 2>&1 || true
 fi
 exit 0
 """ % " ".join(REQS)
@@ -57,8 +57,8 @@ PRERM = """#!/bin/sh
 set -e
 case "$1" in
     remove|upgrade|deconfigure)
-        rm -rf /opt/kinora/venv
-        find /opt/kinora/app -name __pycache__ -type d -prune -exec rm -rf {} + 2>/dev/null || true
+        rm -rf /opt/vidora/venv
+        find /opt/vidora/app -name __pycache__ -type d -prune -exec rm -rf {} + 2>/dev/null || true
         ;;
 esac
 exit 0
@@ -67,14 +67,14 @@ exit 0
 POSTRM = """#!/bin/sh
 set -e
 if [ "$1" = "purge" ] || [ "$1" = "remove" ]; then
-    rmdir /opt/kinora/app /opt/kinora 2>/dev/null || true
+    rmdir /opt/vidora/app /opt/vidora 2>/dev/null || true
 fi
 exit 0
 """
 
 
 def version():
-    m = re.search(r'__version__\s*=\s*"([^"]+)"', (ROOT / "kinora" / "__init__.py").read_text("utf-8"))
+    m = re.search(r'__version__\s*=\s*"([^"]+)"', (ROOT / "vidora" / "__init__.py").read_text("utf-8"))
     return m.group(1)
 
 
@@ -145,30 +145,30 @@ def main():
     ver = version()
     now = int(time.time())
     data = Tree()
-    for f in sorted((ROOT / "kinora").rglob("*.py")):
+    for f in sorted((ROOT / "vidora").rglob("*.py")):
         if "__pycache__" not in f.parts:
-            data.add(f"opt/kinora/app/{f.relative_to(ROOT).as_posix()}", lf(f.read_bytes()))
+            data.add(f"opt/vidora/app/{f.relative_to(ROOT).as_posix()}", lf(f.read_bytes()))
     for w in sorted(WHEELS.glob("*.whl")):
-        data.add(f"opt/kinora/wheels/{w.name}", w.read_bytes())
-    data.add("usr/bin/kinora", LAUNCHER.encode(), 0o755)
-    desktop = lf((ROOT / "data" / "kinora.desktop").read_bytes())
-    data.add("usr/share/applications/kinora.desktop", desktop)
-    data.add("usr/share/icons/hicolor/scalable/apps/kinora.svg", lf((ROOT / "data" / "kinora.svg").read_bytes()))
-    data.add("usr/share/doc/kinora/README.md", lf((ROOT / "README.md").read_bytes()))
+        data.add(f"opt/vidora/wheels/{w.name}", w.read_bytes())
+    data.add("usr/bin/vidora", LAUNCHER.encode(), 0o755)
+    desktop = lf((ROOT / "data" / "vidora.desktop").read_bytes())
+    data.add("usr/share/applications/vidora.desktop", desktop)
+    data.add("usr/share/icons/hicolor/scalable/apps/vidora.svg", lf((ROOT / "data" / "vidora.svg").read_bytes()))
+    data.add("usr/share/doc/vidora/README.md", lf((ROOT / "README.md").read_bytes()))
 
     installed_kb = sum(len(d) for d, _ in data.files.values()) // 1024 + 120_000  # + unpacked venv
     md5 = "".join(f"{hashlib.md5(d).hexdigest()}  {p}\n" for p, (d, _) in sorted(data.files.items()))
-    control = f"""Package: kinora
+    control = f"""Package: vidora
 Version: {ver}
 Architecture: amd64
-Maintainer: Kinora <kinora@localhost>
+Maintainer: Vidora <vidora@localhost>
 Installed-Size: {installed_kb}
 Depends: {", ".join(DEPENDS)}
 Recommends: {", ".join(RECOMMENDS)}
 Section: video
 Priority: optional
 Description: keyboard-friendly video player built on mpv
- Kinora is a desktop video player with a right-click menu for everything,
+ Vidora is a desktop video player with a right-click menu for everything,
  remappable shortcuts, seek-bar thumbnails, resume per file, folder
  playlists, A-B repeat, frame stepping, subtitle and audio sync, and
  picture adjustments. Playback and hardware decoding come from libmpv.
@@ -184,7 +184,7 @@ Description: keyboard-friendly video player built on mpv
               ("data.tar.gz", data.tar(now))])
     dist = ROOT / "dist"
     dist.mkdir(exist_ok=True)
-    out = dist / f"kinora_{ver}_amd64.deb"
+    out = dist / f"vidora_{ver}_amd64.deb"
     out.write_bytes(deb)
     digest = hashlib.sha256(deb).hexdigest()
     (dist / (out.name + ".sha256")).write_text(f"{digest}  {out.name}\n", encoding="utf-8", newline="\n")

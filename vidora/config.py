@@ -16,6 +16,13 @@ def config_dir() -> Path:
     else:
         base = Path(os.environ.get("XDG_CONFIG_HOME") or Path.home() / ".config")
     d = base / APP_ID
+    legacy = base / "kinora"  # settings folder from before the app was renamed to Vidora
+    if not d.exists() and legacy.is_dir():
+        import shutil
+        try:
+            shutil.copytree(legacy, d)
+        except OSError:
+            pass
     d.mkdir(parents=True, exist_ok=True)
     return d
 
@@ -29,7 +36,7 @@ def pictures_dir() -> str:
                                timeout=2).stdout.strip() or None
         except Exception:
             d = None
-    return str(Path(d or Path.home() / "Pictures") / "Kinora")
+    return str(Path(d or Path.home() / "Pictures") / "Vidora")
 
 
 DEFAULTS = {

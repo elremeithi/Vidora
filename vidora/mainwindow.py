@@ -730,7 +730,7 @@ class MainWindow(QMainWindow):
     def copy_frame(self):
         if not self.current:
             return
-        path = os.path.join(tempfile.gettempdir(), f"kinora-clip-{os.getpid()}.png")
+        path = os.path.join(tempfile.gettempdir(), f"vidora-clip-{os.getpid()}.png")
         if self.engine.command("screenshot-to-file", path, "subtitles"):
             img = QImage(path)
             if not img.isNull():
@@ -854,7 +854,7 @@ class MainWindow(QMainWindow):
             self.s.save()
             if self.s["video_surface"] != old_output or self.s["load_mpv_config"] != old_conf:
                 QMessageBox.information(self, "Preferences",
-                                        "Some changes take effect after restarting Kinora.")
+                                        "Some changes take effect after restarting Vidora.")
 
     def apply_settings(self):
         self.engine.apply_settings(self.s)

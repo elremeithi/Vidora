@@ -28,7 +28,7 @@ class Thumbnailer(QObject):
         self.size = (0, 0)
         self._mpv = None
         self._file = None
-        self._out = os.path.join(tempfile.gettempdir(), f"kinora-thumb-{os.getpid()}.bgra")
+        self._out = os.path.join(tempfile.gettempdir(), f"vidora-thumb-{os.getpid()}.bgra")
         self._pending = None
         self._inflight = None
         self._stamp = None

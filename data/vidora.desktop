@@ -1,14 +1,14 @@
 [Desktop Entry]
 Type=Application
-Name=Kinora
+Name=Vidora
 GenericName=Video Player
 Comment=Keyboard-friendly video player built on mpv
-Exec=kinora %U
-TryExec=kinora
-Icon=kinora
+Exec=vidora %U
+TryExec=vidora
+Icon=vidora
 Terminal=false
 Categories=AudioVideo;Video;Player;Qt;
 Keywords=video;movie;player;mpv;subtitles;
-StartupWMClass=kinora
+StartupWMClass=vidora
 StartupNotify=true
 MimeType=video/mp4;video/x-matroska;video/webm;video/x-msvideo;video/avi;video/msvideo;video/quicktime;video/x-flv;video/x-ms-wmv;video/x-ms-asf;video/mpeg;video/mp2t;video/x-mpeg2;video/3gpp;video/3gpp2;video/ogg;video/x-ogm+ogg;video/x-theora+ogg;video/dv;video/x-m4v;video/vnd.rn-realvideo;application/vnd.rn-realmedia;video/x-nsv;video/vnd.avi;video/x-anim;video/x-flic;video/divx;audio/mpeg;audio/mp4;audio/x-m4a;audio/flac;audio/x-flac;audio/ogg;audio/x-vorbis+ogg;audio/opus;audio/wav;audio/x-wav;audio/x-matroska;audio/aac;audio/ac3;audio/x-ms-wma;audio/x-ape;audio/x-wavpack;audio/webm;application/x-matroska;application/ogg;application/vnd.apple.mpegurl;application/x-mpegurl;x-scheme-handler/rtsp;x-scheme-handler/rtmp;x-scheme-handler/mms;

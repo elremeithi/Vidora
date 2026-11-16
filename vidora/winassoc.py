@@ -1,8 +1,8 @@
-"""Windows: list Kinora under "Open with" and Settings > Default apps (per user, no admin).
+"""Windows: list Vidora under "Open with" and Settings > Default apps (per user, no admin).
 
-Windows 10/11 don't let programs make themselves the default; this registers Kinora as a
+Windows 10/11 don't let programs make themselves the default; this registers Vidora as a
 capable app for its file types, then opens Default apps so the user can pick it.
-Only meaningful for the packaged Kinora.exe.
+Only meaningful for the packaged Vidora.exe.
 """
 
 import os
@@ -11,9 +11,12 @@ import sys
 from . import APP_NAME
 from .util import AUDIO_EXTS, VIDEO_EXTS
 
-PROGID_VIDEO = "Kinora.Video"
-PROGID_AUDIO = "Kinora.Audio"
-CAPS = r"Software\Kinora\Capabilities"
+PROGID_VIDEO = "Vidora.Video"
+PROGID_AUDIO = "Vidora.Audio"
+CAPS = r"Software\Vidora\Capabilities"
+# Entries written before the app was renamed from Kinora; removed whenever we (un)register.
+LEGACY = dict(progids=("Kinora.Video", "Kinora.Audio"), exe="Kinora.exe",
+              app_key=r"Software\Kinora", app_name="Kinora")
 
 
 def available() -> bool:
@@ -58,6 +61,7 @@ def is_registered() -> bool:
 
 def register():
     import winreg
+    _remove(**LEGACY)
     for key, name, data in plan():
         with winreg.CreateKeyEx(winreg.HKEY_CURRENT_USER, key, 0, winreg.KEY_SET_VALUE) as k:
             winreg.SetValueEx(k, name, 0, winreg.REG_SZ, data)
@@ -65,6 +69,12 @@ def register():
 
 
 def unregister():
+    _remove(**LEGACY)
+    _remove((PROGID_VIDEO, PROGID_AUDIO), os.path.basename(sys.executable), r"Software\Vidora", APP_NAME)
+    _notify()
+
+
+def _remove(progids, exe, app_key, app_name):
     import winreg
 
     def delete_tree(root, path):
@@ -81,26 +91,25 @@ def unregister():
             pass
 
     hk = winreg.HKEY_CURRENT_USER
-    for progid in (PROGID_VIDEO, PROGID_AUDIO):
+    for progid in progids:
         delete_tree(hk, rf"Software\Classes\{progid}")
-    delete_tree(hk, rf"Software\Classes\Applications\{os.path.basename(sys.executable)}")
-    delete_tree(hk, r"Software\Kinora")
+    delete_tree(hk, rf"Software\Classes\Applications\{exe}")
+    delete_tree(hk, app_key)
     try:
         with winreg.OpenKey(hk, r"Software\RegisteredApplications", 0, winreg.KEY_SET_VALUE) as k:
-            winreg.DeleteValue(k, APP_NAME)
+            winreg.DeleteValue(k, app_name)
     except OSError:
         pass
     for ext in VIDEO_EXTS | AUDIO_EXTS:
         try:
             with winreg.OpenKey(hk, rf"Software\Classes\{ext}\OpenWithProgids", 0, winreg.KEY_SET_VALUE) as k:
-                for progid in (PROGID_VIDEO, PROGID_AUDIO):
+                for progid in progids:
                     try:
                         winreg.DeleteValue(k, progid)
                     except OSError:
                         pass
         except OSError:
             pass
-    _notify()
 
 
 def open_default_apps():

@@ -210,8 +210,8 @@ class PreferencesDialog(QDialog):
     def _sync_assoc(self):
         from . import winassoc
         on = winassoc.is_registered()
-        self._assoc_btn.setText("Remove Kinora from 'Open with' and Default apps" if on
-                                else "Add Kinora to 'Open with' and Default apps...")
+        self._assoc_btn.setText("Remove Vidora from 'Open with' and Default apps" if on
+                                else "Add Vidora to 'Open with' and Default apps...")
 
     def _toggle_assoc(self):
         from . import winassoc
@@ -221,8 +221,8 @@ class PreferencesDialog(QDialog):
             winassoc.register()
             QMessageBox.information(
                 self, "Default apps",
-                "Kinora is now listed under 'Open with' for video and audio files.\n\n"
-                "Windows lets only you choose defaults: Settings will open next. Pick Kinora "
+                "Vidora is now listed under 'Open with' for video and audio files.\n\n"
+                "Windows lets only you choose defaults: Settings will open next. Pick Vidora "
                 "for the file types you want.")
             winassoc.open_default_apps()
         self._sync_assoc()

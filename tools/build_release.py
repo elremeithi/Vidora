@@ -1,4 +1,4 @@
-"""Build dist/kinora-<version>-linux.tar.gz from the source tree.
+"""Build dist/vidora-<version>-linux.tar.gz from the source tree.
 
 Text files are written with LF line endings (the tree may be edited on Windows), shell
 scripts get the executable bit, and caches are left out. Run from any OS:
@@ -15,13 +15,13 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-INCLUDE = ["README.md", "requirements.txt", "install.sh", "run.sh", "data", "kinora"]
+INCLUDE = ["README.md", "requirements.txt", "install.sh", "run.sh", "data", "vidora"]
 EXECUTABLE = {"install.sh", "run.sh"}
 TEXT_EXT = {".py", ".md", ".txt", ".sh", ".desktop", ".svg"}
 
 
 def version():
-    m = re.search(r'__version__\s*=\s*"([^"]+)"', (ROOT / "kinora" / "__init__.py").read_text("utf-8"))
+    m = re.search(r'__version__\s*=\s*"([^"]+)"', (ROOT / "vidora" / "__init__.py").read_text("utf-8"))
     return m.group(1)
 
 
@@ -38,7 +38,7 @@ def files():
 
 def main():
     ver = version()
-    top = f"kinora-{ver}"
+    top = f"vidora-{ver}"
     dist = ROOT / "dist"
     dist.mkdir(exist_ok=True)
     out = dist / f"{top}-linux.tar.gz"
@@ -55,7 +55,7 @@ def main():
             info = tarfile.TarInfo(f"{top}/{rel}")
             info.size, info.mtime = len(data), now
             info.mode = 0o755 if rel in EXECUTABLE else 0o644
-            info.uname = info.gname = "kinora"
+            info.uname = info.gname = "vidora"
             tar.addfile(info, io.BytesIO(data))
     digest = hashlib.sha256(out.read_bytes()).hexdigest()
     (dist / (out.name + ".sha256")).write_text(f"{digest}  {out.name}\n", encoding="utf-8", newline="\n")
