@@ -1,0 +1,9 @@
+# Build output
+build/
+dist/
+publish/
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
